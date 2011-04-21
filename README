@@ -1,5 +1,7 @@
 This project uses block level compression in the lucene FDT files.  This will allow for significant size saving in the FDT files when the lucene fields store a lot of data.
 
+NOTE: Only works when compound file is turned off.
+
 public static void main(String[] args) throws CorruptIndexException, IOException {
     
     Directory fileDir = FSDirectory.open(new File("./dir"));
