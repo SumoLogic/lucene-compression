@@ -57,7 +57,7 @@ public class CompressedFieldDataDirectory extends Directory {
     }
     
     public CompressedFieldDataDirectory(Directory dir, CompressionCodec compression) {
-        this(dir, DEFAULT_COMPRESSION, COMPRESSED_BUFFER_SIZE);
+        this(dir, compression, COMPRESSED_BUFFER_SIZE);
     }
 
     public CompressedFieldDataDirectory(Directory dir, CompressionCodec compression, int blockSize) {
