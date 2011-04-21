@@ -20,6 +20,11 @@ import java.io.IOException;
 
 import com.quicklz.QuickLZ;
 
+/**
+ * QuickLZ is not packaged in this project due to licensing of QuickLZ.
+ * You will have to download the java class from http://www.quicklz.com/QuickLZ.java
+ * @author amccurry
+ */
 public class QuickLZCompressionCodec implements CompressionCodec {
 
     @Override
