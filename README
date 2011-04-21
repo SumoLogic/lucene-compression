@@ -1,0 +1,23 @@
+This project uses block level compression in the lucene FDT files.  This will allow for significant size saving in the FDT files when the lucene fields store a lot of data.
+
+public static void main(String[] args) throws CorruptIndexException, IOException {
+    
+    Directory fileDir = FSDirectory.open(new File("./dir"));
+    
+    DeflaterCompressionCodec compressionCodec = new DeflaterCompressionCodec();
+    
+    CompressedFieldDataDirectory dir = new CompressedFieldDataDirectory(fileDir, compressionCodec, 8192);
+    
+    IndexWriter writer = new IndexWriter(dir, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
+    writer.setUseCompoundFile(false);
+    
+    //create index here
+    
+    writer.close();
+    
+    IndexReader reader = IndexReader.open(dir);
+    
+    //use index here
+    
+    reader.close();
+}
