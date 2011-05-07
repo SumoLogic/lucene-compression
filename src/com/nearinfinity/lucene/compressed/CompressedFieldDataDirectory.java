@@ -25,7 +25,8 @@ import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
 
 public class CompressedFieldDataDirectory extends Directory {
-
+    
+    private static final int _MIN_BUFFER_SIZE = 100;
     private static final String FDZ = ".fdz";
     private static final String FDT = ".fdt";
     private static final String Z_TMP = ".tmp";
@@ -217,8 +218,11 @@ public class CompressedFieldDataDirectory extends Directory {
             _output = directory.createOutput(name);
             _tmpOutput = directory.createOutput(name + Z_TMP);
             _buffer = new byte[blockSize];
-            _compressedBuffer = new byte[blockSize * 2];
-            System.out.println("Writing [" + name + "] [" + blockSize + "]");
+            int dsize = blockSize * 2;
+            if (dsize < _MIN_BUFFER_SIZE) {
+                dsize = _MIN_BUFFER_SIZE;
+            }
+            _compressedBuffer = new byte[dsize];
         }
 
         @Override
@@ -252,7 +256,6 @@ public class CompressedFieldDataDirectory extends Directory {
             for (int i = offset; i < len; i++) {
                 writeByte(b[i]);
             }
-            // _position += length;
         }
 
         @Override
@@ -330,9 +333,11 @@ public class CompressedFieldDataDirectory extends Directory {
             _realLength = _indexInput.length();
             readMetaData();
             _blockBuffer = new byte[_blockSize];
-            _decompressionBuffer = new byte[_blockSize * 2];
-            
-            System.out.println("Org Length " + _origLength + " " + _realLength);
+            int dsize = _blockSize * 2;
+            if (dsize < _MIN_BUFFER_SIZE) {
+                dsize = _MIN_BUFFER_SIZE;
+            }
+            _decompressionBuffer = new byte[dsize];
         }
 
         private void readMetaData() throws IOException {

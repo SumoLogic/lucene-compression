@@ -20,11 +20,13 @@ import org.junit.Test;
 
 public class CompressedFieldDataDirectoryTest {
     
+    private static final CompressionCodec COMPRESSION_CODEC = new DeflaterCompressionCodec();
+
     @Test
     public void testCompressedFieldDataDirectoryBasic() throws CorruptIndexException, IOException {
         RAMDirectory dir = new RAMDirectory();
         CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, 
-                CompressedFieldDataDirectory.DEFAULT_COMPRESSION);
+                COMPRESSION_CODEC);
         IndexWriter writer = new IndexWriter(directory, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,0,10);
@@ -41,7 +43,7 @@ public class CompressedFieldDataDirectoryTest {
         writer.close();
         
         CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, 
-                CompressedFieldDataDirectory.DEFAULT_COMPRESSION);
+                COMPRESSION_CODEC);
         writer = new IndexWriter(directory, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,5,5);
@@ -58,14 +60,14 @@ public class CompressedFieldDataDirectoryTest {
         writer.close();
         
         CompressedFieldDataDirectory directory1 = new CompressedFieldDataDirectory(dir, 
-                CompressedFieldDataDirectory.DEFAULT_COMPRESSION, 2);
+                COMPRESSION_CODEC, 2);
         writer = new IndexWriter(directory1, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,5,2);
         writer.close();
         
         CompressedFieldDataDirectory directory2 = new CompressedFieldDataDirectory(dir, 
-                CompressedFieldDataDirectory.DEFAULT_COMPRESSION, 4);
+                COMPRESSION_CODEC, 4);
         writer = new IndexWriter(directory2, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,7,3);
