@@ -49,8 +49,7 @@ public class CompressedFieldDataDirectory extends Directory {
     
     private CompressionCodec _compression = DEFAULT_COMPRESSION;
     private Directory _directory;
-    private int _blockSize;
-
+    private int _writingBlockSize;
     
     public CompressedFieldDataDirectory(Directory dir) {
         this(dir, DEFAULT_COMPRESSION);
@@ -67,15 +66,15 @@ public class CompressedFieldDataDirectory extends Directory {
         } else {
             _compression = compression;
         }
-        _blockSize = blockSize;
+        _writingBlockSize = blockSize;
     }
 
     private IndexInput wrapInput(String name) throws IOException {
-        return new CompressedIndexInput(name, _directory, _compression, _blockSize);
+        return new CompressedIndexInput(name, _directory, _compression);
     }
 
     private IndexOutput wrapOutput(String name) throws IOException {
-        return new CompressedIndexOutput(name, _directory, _compression, _blockSize);
+        return new CompressedIndexOutput(name, _directory, _compression, _writingBlockSize);
     }
     
     public IndexInput openInput(String name) throws IOException {
@@ -219,6 +218,7 @@ public class CompressedFieldDataDirectory extends Directory {
             _tmpOutput = directory.createOutput(name + Z_TMP);
             _buffer = new byte[blockSize];
             _compressedBuffer = new byte[blockSize * 2];
+            System.out.println("Writing [" + name + "] [" + blockSize + "]");
         }
 
         @Override
@@ -271,6 +271,7 @@ public class CompressedFieldDataDirectory extends Directory {
                 }
                 _output.writeLong(len);
                 _output.writeInt(_blockCount);
+                _output.writeInt(_buffer.length);
                 _output.writeLong(_position);
             } finally {
                 try {
@@ -305,13 +306,14 @@ public class CompressedFieldDataDirectory extends Directory {
     
     public static class CompressedIndexInput extends IndexInput {
         
+        private static final int _SIZES_META_DATA = 24;
         private CompressionCodec _compression;
         private IndexInput  _indexInput;
         private long        _pos;
         private boolean     _isClone;
         private long        _origLength;
         
-        private long   _currentBlockId;
+        private long   _currentBlockId = -1;
         private byte[] _blockBuffer;
         private byte[] _decompressionBuffer;
         
@@ -322,26 +324,28 @@ public class CompressedFieldDataDirectory extends Directory {
         private int    _blockSize;
         
 
-        public CompressedIndexInput(String name, Directory directory, CompressionCodec compression, int blockSize) throws IOException {
+        public CompressedIndexInput(String name, Directory directory, CompressionCodec compression) throws IOException {
             _compression = compression;
             _indexInput = directory.openInput(name);
             _realLength = _indexInput.length();
-            _blockBuffer = new byte[blockSize];
-            _decompressionBuffer = new byte[blockSize * 2];
-            _blockSize = blockSize;
             readMetaData();
+            _blockBuffer = new byte[_blockSize];
+            _decompressionBuffer = new byte[_blockSize * 2];
+            
+            System.out.println("Org Length " + _origLength + " " + _realLength);
         }
 
         private void readMetaData() throws IOException {
-            _indexInput.seek(_realLength - 20); //8 - 4 - 8
+            _indexInput.seek(_realLength - _SIZES_META_DATA); //8 - 4 - 4 - 8
             long metaDataLength = _indexInput.readLong();
             int blockCount = _indexInput.readInt();
+            _blockSize = _indexInput.readInt();
             _origLength = _indexInput.readLong();
             
             _blockLengths = new int[blockCount];
             _blockPositions = new long[blockCount];
             
-            _indexInput.seek(_realLength - 20 - metaDataLength);
+            _indexInput.seek(_realLength - _SIZES_META_DATA - metaDataLength);
             for (int i = 0; i < blockCount; i++) {
                 _blockPositions[i] = _indexInput.readVLong();
                 _blockLengths[i] = _indexInput.readVInt();
@@ -392,6 +396,7 @@ public class CompressedFieldDataDirectory extends Directory {
                     System.arraycopy(_blockBuffer, blockPosition, b, offset, length);
                     _pos += length;
                     len -= length;
+                    offset += length;
                 }
             }
         }
