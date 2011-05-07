@@ -23,8 +23,8 @@ public class CompressedFieldDataDirectoryTest {
     @Test
     public void testCompressedFieldDataDirectoryBasic() throws CorruptIndexException, IOException {
         RAMDirectory dir = new RAMDirectory();
-        CompressionCodec compression = new DeflaterCompressionCodec();
-        CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, compression);
+        CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, 
+                CompressedFieldDataDirectory.DEFAULT_COMPRESSION);
         IndexWriter writer = new IndexWriter(directory, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,0,10);
@@ -40,8 +40,8 @@ public class CompressedFieldDataDirectoryTest {
         addDocs(writer,0,5);
         writer.close();
         
-        CompressionCodec compression = new DeflaterCompressionCodec();
-        CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, compression);
+        CompressedFieldDataDirectory directory = new CompressedFieldDataDirectory(dir, 
+                CompressedFieldDataDirectory.DEFAULT_COMPRESSION);
         writer = new IndexWriter(directory, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,5,5);
@@ -57,14 +57,15 @@ public class CompressedFieldDataDirectoryTest {
         addDocs(writer,0,5);
         writer.close();
         
-        CompressionCodec compression = new DeflaterCompressionCodec();
-        CompressedFieldDataDirectory directory1 = new CompressedFieldDataDirectory(dir, compression, 2);
+        CompressedFieldDataDirectory directory1 = new CompressedFieldDataDirectory(dir, 
+                CompressedFieldDataDirectory.DEFAULT_COMPRESSION, 2);
         writer = new IndexWriter(directory1, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,5,2);
         writer.close();
         
-        CompressedFieldDataDirectory directory2 = new CompressedFieldDataDirectory(dir, compression, 4);
+        CompressedFieldDataDirectory directory2 = new CompressedFieldDataDirectory(dir, 
+                CompressedFieldDataDirectory.DEFAULT_COMPRESSION, 4);
         writer = new IndexWriter(directory2, new KeywordAnalyzer(), MaxFieldLength.UNLIMITED);
         writer.setUseCompoundFile(false);
         addDocs(writer,7,3);

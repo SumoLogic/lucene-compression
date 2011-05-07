@@ -32,7 +32,7 @@ public class CompressedFieldDataDirectory extends Directory {
     
     private static final int COMPRESSED_BUFFER_SIZE = 4096;
     
-    private static CompressionCodec DEFAULT_COMPRESSION = new CompressionCodec() {
+    public static CompressionCodec DEFAULT_COMPRESSION = new CompressionCodec() {
         
         @Override
         public int compress(byte[] src, int length, byte[] dest) {
