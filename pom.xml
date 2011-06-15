@@ -9,9 +9,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.nearinfinity.apache.lucene</groupId>
-			<artifactId>lucene-core-high-scale</artifactId>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
 			<version>3.0.2</version>
+			<scope>provided</scope>
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
