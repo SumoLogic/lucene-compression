@@ -23,6 +23,8 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CompressedFieldDataDirectory extends Directory {
     
@@ -182,7 +184,7 @@ public class CompressedFieldDataDirectory extends Directory {
         return _directory.makeLock(name);
     }
 
-    public void setLockFactory(LockFactory lockFactory) {
+    public void setLockFactory(LockFactory lockFactory) throws IOException {
         _directory.setLockFactory(lockFactory);
     }
 
@@ -308,7 +310,8 @@ public class CompressedFieldDataDirectory extends Directory {
     }
     
     public static class CompressedIndexInput extends IndexInput {
-        
+
+        private static final Logger logger = LoggerFactory.getLogger(CompressedIndexInput.class);
         private static final int _SIZES_META_DATA = 24;
         private CompressionCodec _compression;
         private IndexInput  _indexInput;
@@ -325,9 +328,11 @@ public class CompressedFieldDataDirectory extends Directory {
         private long   _realLength;
         private int    _blockBufferLength;
         private int    _blockSize;
+        private String _name;
         
 
         public CompressedIndexInput(String name, Directory directory, CompressionCodec compression) throws IOException {
+            _name = name;
             _compression = compression;
             _indexInput = directory.openInput(name);
             _realLength = _indexInput.length();
@@ -360,6 +365,7 @@ public class CompressedFieldDataDirectory extends Directory {
         public Object clone() {
             CompressedIndexInput clone = (CompressedIndexInput) super.clone();
             clone._isClone = true;
+            logger.info(String.format("Cloning CompressedIndexInput '%s' my position: %d, clone's position: %d", _name, _pos, clone._pos));
             return clone;
         }
 

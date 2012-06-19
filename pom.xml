@@ -5,13 +5,13 @@
 	<artifactId>lucene-compression</artifactId>
 	<packaging>jar</packaging>
 	<name>Lucene Compression</name>
-	<version>0.1</version>
+	<version>0.2</version>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>3.0.2</version>
+			<version>3.5.0</version>
 			<scope>provided</scope>
 		</dependency>
         <dependency>
@@ -20,6 +20,14 @@
             <version>4.7</version>
             <scope>test</scope>
         </dependency>
+    <!-- Logging. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.8</version>
+      <scope>compile</scope>
+    </dependency>
+
 	</dependencies>
 
 	<repositories>
@@ -29,7 +37,14 @@
 		</repository>
 	</repositories>
 
-	<build>
+  <distributionManagement>
+    <repository>
+      <id>nexus</id>
+      <url>https://nexus.kumoroku.com/nexus/content/repositories/thirdparty</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -40,6 +55,22 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+      <!-- Publish sources. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
 		</plugins>
 	</build>
 </project>
