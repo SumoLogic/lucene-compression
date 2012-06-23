@@ -365,6 +365,12 @@ public class CompressedFieldDataDirectory extends Directory {
         public Object clone() {
             CompressedIndexInput clone = (CompressedIndexInput) super.clone();
             clone._isClone = true;
+            clone._blockBuffer = new byte[_blockSize];
+            int dsize = _blockSize * 2;
+            if (dsize < _MIN_BUFFER_SIZE) {
+                dsize = _MIN_BUFFER_SIZE;
+            }
+            clone._decompressionBuffer = new byte[dsize];
             logger.info(String.format("Cloning CompressedIndexInput '%s' my position: %d, clone's position: %d", _name, _pos, clone._pos));
             return clone;
         }
